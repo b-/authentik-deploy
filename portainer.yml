@@ -1,0 +1,13 @@
+---
+version: "3.4"
+
+services:
+    env_file:
+      - .env
+  redis:
+  server:
+    env_file:
+  worker:
+    env_file:
+      - .env
+    depends_on:
