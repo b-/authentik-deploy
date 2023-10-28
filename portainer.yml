@@ -2,12 +2,9 @@
 version: "3.4"
 
 services:
-    env_file:
-      - .env
-  redis:
+  postgresql:
+    env_file: stack.env
   server:
-    env_file:
+    env_file: stack.env
   worker:
-    env_file:
-      - .env
-    depends_on:
+    env_file: stack.env
