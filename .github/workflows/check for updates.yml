@@ -54,7 +54,7 @@ jobs:
           git config --global user.email "${GITHUB_ACTOR}@users.noreply.github.com"
       - name: Update docker-compose.yml
         run: |
-          curl -sLo- https://goauthentik.io/docker-compose.yml
+          curl -sLo docker-compose.yml https://goauthentik.io/docker-compose.yml
           git add docker-compose.yml
       - name: Commit
         run: git commit -m "Update docker-compose.yml by ${GITHUB_ACTOR}"
