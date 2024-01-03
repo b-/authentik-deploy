@@ -5,10 +5,8 @@ name: Check for update
 # Controls when the workflow will run
 on:
   # Triggers the workflow on push or pull request events but only for the "main" branch
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+  schedule:
+    - cron: '5 4 * * *'
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -31,7 +29,7 @@ jobs:
         run: |
           if ! curl -sLo- https://goauthentik.io/docker-compose.yml \
               | diff docker-compose.yml - ; then
-            echo 'set-output name=compose_changed::true'
+echo "test=hello" >> "$GITHUB_OUTPUT"
           else
             echo 'set-output name=compose_changed::false'
           fi
