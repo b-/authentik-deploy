@@ -19,6 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       changed: ${{ steps.diff.outputs.changed }}
+      compose: ${{ steps.diff.outputs.compose }}
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -31,6 +32,9 @@ jobs:
           if ! curl -sLo- https://goauthentik.io/docker-compose.yml \
               | diff docker-compose.yml - ; then
             echo 'changed=true' | tee -a "$GITHUB_OUTPUT"
+            echo 'compose<<EOF' | tee -a $GITHUB_OUTPUT
+            cat docker-compose.yml | tee -a $GITHUB_OUTPUT
+            echo 'EOF' | tee -a $GITHUB_OUTPUT
           fi
 
   # Run the job only with "compose_changed" equals "true"
@@ -48,8 +52,12 @@ jobs:
         run: |
           git config --global user.name "${GITHUB_ACTOR}"
           git config --global user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+      - name: Update docker-compose.yml
+        run: |
+          curl -sLo- https://goauthentik.io/docker-compose.yml
+          git add docker-compose.yml
       - name: Commit
-        run: git commit -a -m "Update config.json by ${GITHUB_ACTOR}"
+        run: git commit -m "Update docker-compose.yml by ${GITHUB_ACTOR}"
       - name: Git push
         run: git push origin HEAD:${NEW_BRANCH}
       - name: Create Pull Request
