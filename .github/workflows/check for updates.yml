@@ -70,5 +70,5 @@ jobs:
               title: '${{ env.NEW_BRANCH }}',
               body: `Created by \`${ process.env.GITHUB_ACTOR }\``,
               head: '${{ env.NEW_BRANCH }}',
-              base: 'master'
+              base: 'main'
             })
