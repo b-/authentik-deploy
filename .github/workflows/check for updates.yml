@@ -4,7 +4,7 @@ name: Check for update
 
 # Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the "main" branch
+  push:
   schedule:
     - cron: '5 4 * * *'
 
@@ -41,6 +41,7 @@ jobs:
     if: needs.diff.outputs.changed == 'true'
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
+      - uses: actions/checkout@v3
       - name: Set environments
         run: echo "NEW_BRANCH=update-config-$(date +%Y-%m-%d_%H%M%S-utc)" >> $GITHUB_ENV
       - name: Configure git
