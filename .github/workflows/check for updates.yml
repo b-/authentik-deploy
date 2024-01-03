@@ -25,7 +25,8 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
       
-      - name: diff
+      - name: Compare to upstream docker-compose.yml
+        id: diff
         run: |
           if ! curl -sLo- https://goauthentik.io/docker-compose.yml \
               | diff docker-compose.yml - ; then
