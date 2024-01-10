@@ -29,7 +29,7 @@ jobs:
       - name: Compare to upstream docker-compose.yml
         id: diff
         run: |
-          if ! curl -sLo- https://goauthentik.io/version/2023.10/docker-compose.yml \
+          if ! curl -sLo- https://goauthentik.io/docker-compose.yml \
               | diff docker-compose.yml - ; then
             echo 'changed=true' | tee -a "$GITHUB_OUTPUT"
             echo 'compose<<EOF' | tee -a $GITHUB_OUTPUT
