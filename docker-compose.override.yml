@@ -18,7 +18,7 @@ services:
     depends_on:
       media-deploy:
           condition: service_completed_successfully
-          required: false # warns us if not satisfied, but won't prevent service start
+          # required: false # warns us if not satisfied, but won't prevent service start
 
   media-deploy: # Deploys the `media` volume
     image: ghcr.io/perchnet/authentik-win95-setup:main
