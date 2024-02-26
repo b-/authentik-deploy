@@ -11,7 +11,8 @@ services:
     depends_on:
       media-deploy:
           condition: service_completed_successfully
-          required: false # warns us if not satisfied, but won't prevent service start
+          # commented out because harbormaster gets mad
+          # required: false # warns us if not satisfied, but won't prevent service start
   worker:
     env_file: stack.env
     depends_on:
