@@ -1,5 +1,3 @@
-# if i didn't march to a different drummer this would be called
-# docker-compose.override.yml
 ---
 version: "3.4"
 
