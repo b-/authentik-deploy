@@ -1,0 +1,10 @@
+config:
+  prune: false
+apps:
+  authentik:
+    url: https://github.com/b-/authentik-deploy.git
+    branch: hm
+    compose_config:
+        - docker-compose.yml
+        - docker-compose.override.yml
+    environment_file: "stack.env"
