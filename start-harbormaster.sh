@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 set -x
-docker run -d \
-    --name harbormaster \
+docker rm -f harbormaster-authentik
+docker run  \
+    --name harbormaster-authentik \
     --restart unless-stopped \
     -v /var/run/docker.sock:/var/run/docker.sock \
     -v ./:/config \

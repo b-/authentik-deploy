@@ -3,9 +3,9 @@ version: "3.4"
 
 services:
   postgresql:
-    env_file: stack.env
+    env_file: ../../stack.env
   server:
-    env_file: stack.env
+    env_file: ../../stack.env
     volumes:
       - ./media/custom-css.css:/web/dist/custom.css
     depends_on:
@@ -14,7 +14,7 @@ services:
           # commented out because harbormaster gets mad
           # required: false # warns us if not satisfied, but won't prevent service start
   worker:
-    env_file: stack.env
+    env_file: ../../stack.env
     depends_on:
       media-deploy:
           condition: service_completed_successfully
