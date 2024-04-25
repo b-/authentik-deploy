@@ -10,7 +10,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Download docker-compose.yml
-        run: curl -sLo docker-compose.yml https://raw.githubusercontent.com/goauthentik/authentik/master/repo_content/docker-compose.yml
+        run: curl -sLo docker-compose.yml https://raw.githubusercontent.com/goauthentik/authentik/master/docker-compose.yml
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v5
         with:
