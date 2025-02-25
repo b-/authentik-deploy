@@ -8,3 +8,30 @@ services:
     env_file: stack.env
   worker:
     env_file: stack.env
+  backup:
+      container_name: authentik_db_backup
+      image: prodrigestivill/postgres-backup-local:16
+      #      networks:
+      #        - proxy
+      user: 568:568
+      restart: always
+      environment:
+        POSTGRES_HOST: postgresql
+        POSTGRES_CLUSTER: "TRUE"
+        POSTGRES_EXTRA_OPTS: --clean
+        POSTGRES_USER: ${PG_USER}
+        POSTGRES_PASSWORD: ${PG_PASS}
+        POSTGRES_DB: ${PG_DB}
+        SCHEDULE: 0 55 3 * * *
+        BACKUP_DIR: /db_dumps
+        BACKUP_KEEP_DAYS: 7
+        BACKUP_KEEP_WEEKS: 4
+        BACKUP_KEEP_MONTHS: 6
+        #WEBHOOK_URL: ${DB_BACKUP_WEBHOOK_URL}
+        TZ: America/New_York
+      volumes:
+        - /root/authentik_db_backup:/db_dumps
+        #- /mnt/data/db-backup/00-kuma-webhoo.sh:/hooks/00-webhook
+      depends_on:
+        postgresql:
+          condition: service_healthy
