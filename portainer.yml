@@ -18,12 +18,13 @@ services:
     restart: always
     environment:
       POSTGRES_HOST: postgresql
-      POSTGRES_CLUSTER: "TRUE"
+      POSTGRES_CLUSTER: "FALSE"
       POSTGRES_EXTRA_OPTS: --clean
-      POSTGRES_USER: ${PG_USER}
+      POSTGRES_USER: ${PG_USER:-authentik}
       POSTGRES_PASSWORD: ${PG_PASS}
-      POSTGRES_DB: ${PG_DB}
+      POSTGRES_DB: ${PG_DB:-authentik}
       SCHEDULE: 0 55 3 * * *
+      BACKUP_ON_START: "TRUE"
       BACKUP_DIR: /db_dumps
       BACKUP_KEEP_DAYS: 7
       BACKUP_KEEP_WEEKS: 4
@@ -31,7 +32,8 @@ services:
       #WEBHOOK_URL: ${DB_BACKUP_WEBHOOK_URL}
       TZ: America/New_York
     volumes:
-      - /root/authentik_db_backup:/db_dumps
+      - ./authentik_db_backup:/db_dumps
+      #- /root/authentik_db_backup:/db_dumps
       #- /mnt/data/db-backup/00-kuma-webhoo.sh:/hooks/00-webhook
     depends_on:
       postgresql:

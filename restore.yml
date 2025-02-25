@@ -1,0 +1,10 @@
+---
+services:
+  postgresql:
+    env_file: stack.env
+    volumes:
+      - "/tmp/authentik-restore.sql:/docker-entrypoint-initdb.d/restore.sql"
+    environment:
+      POSTGRES_PASSWORD: ${PG_PASS:?database password required}
+      POSTGRES_USER: ${PG_USER:-authentik}
+      POSTGRES_DB: ${PG_DB:-authentik}
