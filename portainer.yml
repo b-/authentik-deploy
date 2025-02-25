@@ -14,7 +14,7 @@ services:
     image: prodrigestivill/postgres-backup-local:16
     #      networks:
     #        - proxy
-    user: 568:568
+    #user: 568:568
     restart: always
     environment:
       POSTGRES_HOST: postgresql
