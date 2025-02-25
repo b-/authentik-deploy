@@ -2,8 +2,10 @@
 services:
   postgresql:
     env_file: stack.env
+    image: docker.io/library/postgres:16-alpine
     volumes:
-      - "/tmp/authentik-restore.sql:/docker-entrypoint-initdb.d/restore.sql"
+      - "./authentik-restore.sql:/docker-entrypoint-initdb.d/restore.sql"
+      - database:/var/lib/postgresql/data
     environment:
       POSTGRES_PASSWORD: ${PG_PASS:?database password required}
       POSTGRES_USER: ${PG_USER:-authentik}
