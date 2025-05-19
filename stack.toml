@@ -17,7 +17,7 @@ branch = "komodo"
 file_paths = [
   "docker-compose.yml",
   "stack.override.yaml",
-  "portainer.yml",
+  "backup.yaml",
 ]
 env_file_path = "stack.env"
 environment = """
