@@ -18,10 +18,8 @@ file_paths = [
   "docker-compose.yml",
   "stack.override.yaml",
   "portainer.yml",
-  "backup.yaml"
 ]
 env_file_path = "stack.env"
-additional_env_files = [".env"]
 environment = """
 PG_USER=authentik
 PG_PASS=[[OP__KOMODO__AUTHENTIK__PG_PASS]]
