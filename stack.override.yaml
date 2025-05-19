@@ -1,16 +1,10 @@
-## Add your compose file here
+---
+version: "3.4"
+
 services:
-  hello_world:
-    image: hello-world
-    # networks:
-    #   - default
-    # ports:
-    #   - 3000:3000
-    # volumes:
-    #   - data:/data
-
-# networks:
-#   default: {}
-
-# volumes:
-#   data:
+  postgresql:
+    env_file: stack.env
+  server:
+    env_file: stack.env
+  worker:
+    env_file: stack.env

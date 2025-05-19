@@ -2,19 +2,9 @@
 version: "3.4"
 
 services:
-  postgresql:
-    env_file: stack.env
-  server:
-    env_file: stack.env
-  worker:
-    env_file: stack.env
   backup:
     env_file: stack.env
-    container_name: authentik_db_backup
     image: prodrigestivill/postgres-backup-local:16
-    #      networks:
-    #        - proxy
-    #user: 568:568
     restart: always
     environment:
       POSTGRES_HOST: postgresql
@@ -32,8 +22,7 @@ services:
       #WEBHOOK_URL: ${DB_BACKUP_WEBHOOK_URL}
       TZ: America/New_York
     volumes:
-      - ./authentik_db_backup:/db_dumps
-      #- /root/authentik_db_backup:/db_dumps
+      - /root/authentik_db_backup:/db_dumps
       #- /mnt/data/db-backup/00-kuma-webhoo.sh:/hooks/00-webhook
     depends_on:
       postgresql:
