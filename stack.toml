@@ -1,1 +1,41 @@
-## Add resources to get started
+[[stack]]
+name = "authentik"
+tags = ["authentik"]
+[stack.config]
+server = "auth"
+links = [
+  "https://github.com/b-/authentik-deploy",
+  "https://auth.shark-perch.ts.net",
+  "https://auth.ibeep.com"
+]
+project_name = "authentik_live"
+poll_for_updates = true
+destroy_before_deploy = true
+git_account = "b-"
+repo = "b-/authentik-deploy"
+branch = "komodo"
+file_paths = [
+  "docker-compose.yml",
+  "stack.override.yaml",
+  "portainer.yml",
+  "backup.yaml"
+]
+env_file_path = "stack.env"
+additional_env_files = [".env"]
+environment = """
+PG_USER=authentik
+PG_PASS=[[OP__KOMODO__AUTHENTIK__PG_PASS]]
+AUTHENTIK_SECRET_KEY=[[OP__KOMODO__AUTHENTIK__AUTHENTIK_SECRET_KEY]]
+AUTHENTIK_EMAIL__HOST=smtp.sendgrid.net
+AUTHENTIK_EMAIL__PORT=465
+AUTHENTIK_EMAIL__USERNAME=[[OP__KOMODO__SENDGRID_SMTP_API__USERNAME]]
+AUTHENTIK_EMAIL__PASSWORD=[[OP__KOMODO__SENDGRID_SMTP_API__CREDENTIAL]]
+AUTHENTIK_EMAIL__USE_TLS=false
+AUTHENTIK_EMAIL__USE_SSL=true
+AUTHENTIK_EMAIL__TIMEOUT=10
+AUTHENTIK_EMAIL__FROM=[[OP__KOMODO__SENDGRID_SMTP_API__FROM]]
+COMPOSE_PORT_HTTP=29000
+COMPOSE_PORT_HTTPS=29443
+BACKUP_ON_START=TRUE
+POSTGRES_DB=postgres
+"""
