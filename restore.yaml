@@ -1,0 +1,19 @@
+---
+services:
+  restore:
+    depends_on:
+      - postgresql
+    image: postgres:16
+    #tty: true
+    #stdin_open: true
+    environment:
+      PG_PASS: ${PG_PASS:?need pass}
+    volumes:
+      - "./authentik-restore.sql:/backup/authentik-restore.sql"
+    command: /bin/bash -xc "cat /backup/authentik-restore.sql | psql --host=postgresql --username=${PG_USER:-authentik} --dbname=${PG_DB:-authentik} -W"
+  ### mask services we don't want running
+  redis: !reset
+  server: !reset
+  worker: !reset
+  proxy: !reset
+  authentik-proxy: !reset

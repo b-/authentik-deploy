@@ -1,0 +1,9 @@
+---
+services:
+  postgresql:
+    volumes:
+      - type: bind
+        source: ./authentik-restore.sql
+        target: /docker-entrypoint-initdb.d/authentik-restore.sql
+        bind:
+          create_host_path: false
