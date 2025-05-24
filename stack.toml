@@ -2,11 +2,11 @@
 name = "authentik"
 tags = ["authentik"]
 [stack.config]
-server = "auth"
+server = "mediaboxlite"
 links = [
-  "https://github.com/b-/authentik-deploy",
-  "https://auth.shark-perch.ts.net",
-  "https://auth.ibeep.com"
+    "https://github.com/b-/authentik-deploy",
+    "https://auth.shark-perch.ts.net",
+    "https://auth.ibeep.com",
 ]
 project_name = "authentik_live"
 poll_for_updates = true
@@ -15,9 +15,10 @@ git_account = "b-"
 repo = "b-/authentik-deploy"
 branch = "komodo"
 file_paths = [
-  "docker-compose.yml",
-  "stack.override.yaml",
-  "backup.yaml",
+    "docker-compose.yml",
+    "stack.override.yaml",
+    "backup.yaml",
+    "init.yaml",
 ]
 env_file_path = "stack.env"
 environment = """
