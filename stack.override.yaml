@@ -1,10 +1,39 @@
 ---
 version: "3.4"
 
+networks:
+  default:
+  external:
+    name: traefik
+    external: true
+
 services:
   postgresql:
     env_file: stack.env
   server:
     env_file: stack.env
+    networks:
+      - default
+      - external
   worker:
     env_file: stack.env
+    networks:
+      - default
+      - external
+  authentik-proxy:
+    networks:
+      - default
+      - external
+    ports:
+      - 9000:9000
+      - 9443:9443
+    image: ghcr.io/goauthentik/proxy:${AUTHENTIK_TAG:-2025.4.1}
+    restart: unless-stopped
+    environment:
+      AUTHENTIK_HOST: http://server:9000
+      AUTHENTIK_INSECURE: "true"
+      AUTHENTIK_TOKEN: ${AUTHENTIK_TOKEN:?AUTHENTIK_TOKEN is not set}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.authentik-proxy.rule=PathPrefix(`/outpost.goauthentik.io/`)"
+      #- "traefik.http.routers.authentik-proxy.entrypoints=websecure"
