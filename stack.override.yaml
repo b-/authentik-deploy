@@ -15,12 +15,16 @@ services:
     networks:
       - default
       - external
+    labels:
+      - traefik.enable=true
+      - "traefik.http.routers.authentik.rule=${TRAEFIK_RULE_PREFIX}auth${TRAEFIK_RULE_SUFFIX}"
   worker:
     env_file: stack.env
     networks:
       - default
       - external
   authentik-proxy:
+    container_name: authentik-proxy.internal
     networks:
       - default
       - external
@@ -36,4 +40,8 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.authentik-proxy.rule=PathPrefix(`/outpost.goauthentik.io/`)"
+      - traefik.http.middlewares.authentik-auth.forwardauth.address=http://authentik-proxy.internal:9000/outpost.goauthentik.io/auth/traefik
+      - traefik.http.middlewares.authentik-auth.forwardauth.trustForwardHeader=true
+      - traefik.http.middlewares.authentik-auth.forwardauth.authResponseHeaders=X-authentik-username,X-authentik-groups,X-authentik-entitlements,X-authentik-email,X-authentik-name,X-authentik-uid,X-authentik-jwt,X-authentik-meta-jwks,X-authentik-meta-outpost,X-authentik-meta-provider,X-authentik-meta-app,X-authentik-meta-version
+
       #- "traefik.http.routers.authentik-proxy.entrypoints=websecure"
