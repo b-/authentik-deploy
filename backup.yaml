@@ -20,7 +20,7 @@ services:
       #WEBHOOK_URL: ${DB_BACKUP_WEBHOOK_URL}
       TZ: America/New_York
     volumes:
-      - ./authentik_db_backup:/db_dumps
+      - /etc/komodo/authentik_db_backup:/db_dumps
       #- /mnt/data/db-backup/00-kuma-webhoo.sh:/hooks/00-webhook
     depends_on:
       postgresql:
