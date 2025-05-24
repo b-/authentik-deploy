@@ -2,7 +2,7 @@
 name = "authentik"
 tags = ["authentik"]
 [stack.config]
-server = "mediaboxlite"
+server = "auth"
 links = [
     "https://github.com/b-/authentik-deploy",
     "https://auth.shark-perch.ts.net",
@@ -18,7 +18,7 @@ file_paths = [
     "docker-compose.yml",
     "stack.override.yaml",
     "backup.yaml",
-    "init.yaml",
+    #"init.yaml",
 ]
 env_file_path = "stack.env"
 environment = """
