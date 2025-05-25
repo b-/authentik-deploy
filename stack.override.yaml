@@ -42,7 +42,7 @@ services:
   server:
     env_file: stack.env
     network_mode: service:server-ts
-    networks:
+    networks: !reset null
     #  - default
     #  - external
     labels:
@@ -61,6 +61,7 @@ services:
   proxy:
     container_name: authentik-proxy.internal
     network_mode: service:proxy-ts
+    networks: !reset null
     #networks:
     #  - default
     #  - external
