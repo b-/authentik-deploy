@@ -1,4 +1,47 @@
 ---
+configs:
+  server_serve:
+    content: |
+      {
+          "TCP": {
+              "443": {
+                  "HTTPS": true
+              }
+          },
+          "Web": {
+              "${TS_CERT_DOMAIN}:443": {
+                  "Handlers": {
+                      "/": {
+                          "Proxy": "https+insecure://localhost:29443"
+                      }
+                  }
+              }
+          },
+          "AllowFunnel": {
+              "${TS_CERT_DOMAIN}:443": true
+          }
+      }
+  proxy_serve:
+    content: |
+      {
+          "TCP": {
+              "443": {
+                  "HTTPS": true
+              }
+          },
+          "Web": {
+              "${TS_CERT_DOMAIN}:443": {
+                  "Handlers": {
+                      "/": {
+                          "Proxy": "https+insecure://localhost:9443"
+                      }
+                  }
+              }
+          },
+          "AllowFunnel": {
+              "${TS_CERT_DOMAIN}:443": true
+          }
+      }
 x-ts-sidecar: &ts-sidecar
   image: tailscale/tailscale:latest
   environment: &ts-env
@@ -42,6 +85,10 @@ services:
     environment:
       <<: *ts-env
       TS_HOSTNAME: "authentik"
+      TS_SERVE_CONFIG: /config/ts_serve.json
+    configs:
+      - source: proxy_serve
+        target: /config/ts_serve.json
     labels:
       - traefik.enable=true
       - "traefik.http.routers.authentik.rule=${TRAEFIK_RULE_PREFIX}auth${TRAEFIK_RULE_SUFFIX}"
@@ -62,6 +109,13 @@ services:
     environment:
       <<: *ts-env
       TS_HOSTNAME: "authentik-proxy"
+      TS_SERVE_CONFIG: /config/ts_serve.json
+    configs:
+      - source: proxy_serve
+        target: /config/ts_serve.json
+    #ports:
+    #  - 9000:9000
+    #  - 9443:9443
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.authentik-proxy.rule=PathPrefix(`/outpost.goauthentik.io/`)"
