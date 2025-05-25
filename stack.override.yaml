@@ -1,20 +1,50 @@
 ---
-version: "3.4"
+x-ts-sidecar: &ts-sidecar
+  image: tailscale/tailscale:latest
+  environment: &ts-env
+    TS_AUTHKEY: ${TS_AUTHKEY}
+    TS_EXTRA_ARGS: "--advertise-tags=tag:docker"
+    #TS_USERSPACE: false
+    TS_ENABLE_HEALTH_CHECK: true
+    TS_LOCAL_ADDR_PORT: 127.0.0.1:41234
+    TS_STATE: "mem:"
+    #TS_SERVE_CONFIG: /config/serve.json
+    #TS_HOSTNAME: generic-sidecar
+  #    ports:
+  #      - "8120"
+  #    devices:
+  #      - /dev/net/tun:/dev/net/tun # Network configuration for Tailscale to work
+  #    cap_add:
+  #      - net_admin # Tailscale requirement
+  #      - sys_module # Tailscale requirement
+  healthcheck:
+    test: ["CMD", "wget", "--spider", "-q", "http://127.0.0.1:41234/healthz"] # Check Tailscale has a Tailnet IP and is operational
+    interval: 1m # How often to perform the check
+    timeout: 10s # Time to wait for the check to succeed
+    retries: 3 # Number of retries before marking as unhealthy
+    start_period: 10s # Time to wait before starting health checks
+  restart: always
 
 networks:
   default:
-  external:
-    name: traefik
-    external: true
+#  external:
+#    name: traefik
+#    external: true
 
 services:
   postgresql:
     env_file: stack.env
+  server-ts:
+    <<: *ts-sidecar
+    environment:
+      <<: *ts-env
+      TS_HOSTNAME: "authentik"
   server:
     env_file: stack.env
+    network_mode: service:server-ts
     networks:
-      - default
-      - external
+    #  - default
+    #  - external
     labels:
       - traefik.enable=true
       - "traefik.http.routers.authentik.rule=${TRAEFIK_RULE_PREFIX}auth${TRAEFIK_RULE_SUFFIX}"
@@ -23,14 +53,20 @@ services:
     networks:
       - default
       - external
-  authentik-proxy:
+  proxy-ts:
+    <<: *ts-sidecar
+    environment:
+      <<: *ts-env
+      TS_HOSTNAME: "authentik-proxy"
+  proxy:
     container_name: authentik-proxy.internal
-    networks:
-      - default
-      - external
-    ports:
-      - 9000:9000
-      - 9443:9443
+    network_mode: service:proxy-ts
+    #networks:
+    #  - default
+    #  - external
+    #ports:
+    #  - 9000:9000
+    #  - 9443:9443
     image: ghcr.io/goauthentik/proxy:${AUTHENTIK_TAG:-2025.4.1}
     restart: unless-stopped
     environment:
@@ -40,7 +76,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.authentik-proxy.rule=PathPrefix(`/outpost.goauthentik.io/`)"
-      - traefik.http.middlewares.authentik-auth.forwardauth.address=http://authentik-proxy.internal:9000/outpost.goauthentik.io/auth/traefik
+      - traefik.http.middlewares.authentik-auth.forwardauth.address=http://authentik-proxy.shark-perch.ts.net:9000/outpost.goauthentik.io/auth/traefik
       - traefik.http.middlewares.authentik-auth.forwardauth.trustForwardHeader=true
       - traefik.http.middlewares.authentik-auth.forwardauth.authResponseHeaders=X-authentik-username,X-authentik-groups,X-authentik-entitlements,X-authentik-email,X-authentik-name,X-authentik-uid,X-authentik-jwt,X-authentik-meta-jwks,X-authentik-meta-outpost,X-authentik-meta-provider,X-authentik-meta-app,X-authentik-meta-version
 
