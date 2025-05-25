@@ -36,12 +36,16 @@ services:
     env_file: stack.env
   server-ts:
     <<: *ts-sidecar
+    ports:
+      - "${COMPOSE_PORT_HTTP:-9000}:9000"
+      - "${COMPOSE_PORT_HTTPS:-9443}:9443"
     environment:
       <<: *ts-env
       TS_HOSTNAME: "authentik"
   server:
     env_file: stack.env
     network_mode: service:server-ts
+    ports: !reset []
     #  - default
     #  - external
     labels:
