@@ -9,7 +9,7 @@ configs:
               }
           },
           "Web": {
-              "${TS_CERT_DOMAIN}:443": {
+              "$${TS_CERT_DOMAIN}:443": {
                   "Handlers": {
                       "/": {
                           "Proxy": "https+insecure://localhost:29443"
@@ -18,7 +18,7 @@ configs:
               }
           },
           "AllowFunnel": {
-              "${TS_CERT_DOMAIN}:443": true
+              "$${TS_CERT_DOMAIN}:443": true
           }
       }
   proxy_serve:
@@ -30,7 +30,7 @@ configs:
               }
           },
           "Web": {
-              "${TS_CERT_DOMAIN}:443": {
+              "$${TS_CERT_DOMAIN}:443": {
                   "Handlers": {
                       "/": {
                           "Proxy": "https+insecure://localhost:9443"
@@ -39,7 +39,7 @@ configs:
               }
           },
           "AllowFunnel": {
-              "${TS_CERT_DOMAIN}:443": true
+              "$${TS_CERT_DOMAIN}:443": true
           }
       }
 x-ts-sidecar: &ts-sidecar
@@ -47,7 +47,7 @@ x-ts-sidecar: &ts-sidecar
   environment: &ts-env
     TS_AUTHKEY: ${TS_AUTHKEY}
     TS_EXTRA_ARGS: "--advertise-tags=tag:docker"
-    #TS_USERSPACE: false
+    TS_USERSPACE: false
     TS_ENABLE_HEALTH_CHECK: true
     TS_LOCAL_ADDR_PORT: 127.0.0.1:41234
     TS_STATE: "mem:"
@@ -55,11 +55,11 @@ x-ts-sidecar: &ts-sidecar
     #TS_HOSTNAME: generic-sidecar
   #    ports:
   #      - "8120"
-  #    devices:
-  #      - /dev/net/tun:/dev/net/tun # Network configuration for Tailscale to work
-  #    cap_add:
-  #      - net_admin # Tailscale requirement
-  #      - sys_module # Tailscale requirement
+  devices:
+    - /dev/net/tun:/dev/net/tun # Network configuration for Tailscale to work
+  cap_add:
+    - net_admin # Tailscale requirement
+    - sys_module # Tailscale requirement
   healthcheck:
     test: ["CMD", "wget", "--spider", "-q", "http://127.0.0.1:41234/healthz"] # Check Tailscale has a Tailnet IP and is operational
     interval: 1m # How often to perform the check
