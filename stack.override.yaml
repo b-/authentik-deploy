@@ -42,7 +42,6 @@ services:
   server:
     env_file: stack.env
     network_mode: service:server-ts
-    networks: !reset null
     #  - default
     #  - external
     labels:
@@ -50,9 +49,9 @@ services:
       - "traefik.http.routers.authentik.rule=${TRAEFIK_RULE_PREFIX}auth${TRAEFIK_RULE_SUFFIX}"
   worker:
     env_file: stack.env
-    networks:
-      - default
-      - external
+  #    networks:
+  #      - default
+  #      #- external
   proxy-ts:
     <<: *ts-sidecar
     environment:
@@ -61,7 +60,6 @@ services:
   proxy:
     container_name: authentik-proxy.internal
     network_mode: service:proxy-ts
-    networks: !reset null
     #networks:
     #  - default
     #  - external
