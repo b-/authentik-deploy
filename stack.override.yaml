@@ -1,4 +1,3 @@
----
 configs:
   server_serve:
     content: |
@@ -87,7 +86,7 @@ services:
       TS_HOSTNAME: "authentik"
       TS_SERVE_CONFIG: /config/ts_serve.json
     configs:
-      - source: proxy_serve
+      - source: server_serve
         target: /config/ts_serve.json
     labels:
       - traefik.enable=true
@@ -135,7 +134,7 @@ services:
     image: ghcr.io/goauthentik/proxy:${AUTHENTIK_TAG:-2025.4.1}
     restart: unless-stopped
     environment:
-      AUTHENTIK_HOST: http://server:9000
+      AUTHENTIK_HOST: http://authentik.shark-perch.ts.net:29000
       AUTHENTIK_INSECURE: "true"
       AUTHENTIK_TOKEN: ${AUTHENTIK_TOKEN:?AUTHENTIK_TOKEN is not set}
 
