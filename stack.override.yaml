@@ -46,6 +46,8 @@ configs:
       }
 x-ts-sidecar: &ts-sidecar
   image: tailscale/tailscale:latest
+  secrets:
+    - ts_authkey
   environment: &ts-env
     TS_AUTHKEY: "file:/run/secrets/ts_authkey"
     TS_EXTRA_ARGS: "--advertise-tags=tag:docker"
