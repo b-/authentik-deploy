@@ -1,3 +1,6 @@
+secrets:
+  ts_authkey:
+    environment: "TS_AUTHKEY"
 configs:
   server_serve:
     content: |
@@ -44,7 +47,7 @@ configs:
 x-ts-sidecar: &ts-sidecar
   image: tailscale/tailscale:latest
   environment: &ts-env
-    TS_AUTHKEY: ${TS_AUTHKEY}
+    TS_AUTHKEY: "file:/ts_authkey"
     TS_EXTRA_ARGS: "--advertise-tags=tag:docker"
     TS_USERSPACE: false
     TS_ENABLE_HEALTH_CHECK: true
