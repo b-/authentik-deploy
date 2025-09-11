@@ -14,7 +14,7 @@ configs:
               "$${TS_CERT_DOMAIN}:443": {
                   "Handlers": {
                       "/": {
-                          "Proxy": "http://localhost:${COMPOSE_PORT_HTTP:-9000}:9000"
+                          "Proxy": "http://localhost:9000"
                       }
                   }
               }
