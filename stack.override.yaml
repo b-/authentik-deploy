@@ -88,24 +88,22 @@ services:
     network_mode: service:server-ts
     ports: !reset []
     volumes: !override
-      - /var/run/docker.sock:/var/run/docker.sock
       - /srv/authentik/media:/media
-      - /var/lib/acme-redirect:/var/lib/acme-redirect
-      - /srv/authentik/certs:/certs
       - /srv/authentik/custom-templates:/templates
   worker:
     volumes: !override
       - /var/run/docker.sock:/var/run/docker.sock
-      - /srv/authentik/media:/media
-      - /var/lib/acme-redirect:/var/lib/acme-redirect
       - /certs:/certs
+      - /srv/authentik/media:/media
       - /srv/authentik/custom-templates:/templates
     env_file: stack.env
 
   acme-redirect:
     #image: ghcr.io/kpcyrd/acme-redirect:latest
     build: https://github.com/kpcyrd/acme-redirect.git#main
-    command: daemon --data-dir /certs -vvv
+    command: daemon -vvv
+    environment:
+      ACME_DATA_DIR: /certs
     volumes:
       - /certs:/certs
       - /srv/acme-redirect/challs:/run/acme-redirect/challs
