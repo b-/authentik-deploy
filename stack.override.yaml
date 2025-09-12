@@ -94,6 +94,7 @@ services:
     volumes: !override
       - /var/run/docker.sock:/var/run/docker.sock
       - /srv/authentik/media:/media
+      - /var/lib/acme-redirect:/var/lib/acme-redirect
       - /srv/authentik/certs:/certs
       - /srv/authentik/custom-templates:/templates
     env_file: stack.env
@@ -104,6 +105,7 @@ services:
     command: daemon -vvvv
     volumes:
       - /srv/authentik/certs:/var/lib/acme-redirect
+      - /var/lib/acme-redirect:/var/lib/acme-redirect
       - /srv/acme-redirect/challs:/run/acme-redirect/challs
     ports:
       - 80:80
