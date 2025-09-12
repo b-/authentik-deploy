@@ -14,7 +14,7 @@ configs:
       name = "auth-01.ibeep.com"
       dns_names = [
         "auth.ibeep.com",
-        "auth-01.ibeep.com"
+        "auth-01.ibeep.com",
       ]
   server_serve:
     content: |
@@ -109,4 +109,4 @@ services:
       - source: acme-redirect.conf
         target: /etc/acme-redirect.conf
       - source: acme-redirect-domain.conf
-        target: /etc/acme-redirect.d/acme-redirect-domain.conf
+        target: /etc/acme-redirect.d/auth.ibeep.com.conf
