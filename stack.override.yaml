@@ -106,6 +106,8 @@ services:
     env_file: stack.env
 
   tsidp:
+    secrets:
+      - ts_authkey
     container_name: tsidp
     #ports:
     #    - 443:443
