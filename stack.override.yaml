@@ -104,7 +104,7 @@ services:
     build: https://github.com/kpcyrd/acme-redirect.git#main
     command: daemon -vvvv
     volumes:
-      - /srv/authentik/certs:/var/lib/acme-redirect
+      - /srv/authentik/certs:/var/lib/acme-redirect/live
       - /var/lib/acme-redirect:/var/lib/acme-redirect
       - /srv/acme-redirect/challs:/run/acme-redirect/challs
     ports:
