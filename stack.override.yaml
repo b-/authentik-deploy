@@ -1,6 +1,8 @@
 secrets:
   ts_authkey:
     environment: "TS_AUTHKEY"
+  tsidp_authkey:
+    environment: "TSIDP_AUTHKEY"
 configs:
   acme-redirect.conf:
     content: |
@@ -107,12 +109,12 @@ services:
 
   tsidp:
     secrets:
-      - ts_authkey
+      - tsidp_authkey
     container_name: tsidp
     #ports:
     #    - 443:443
     environment:
-      TS_AUTHKEY: "${TS_AUTHKEY}"
+      TS_AUTHKEY: "file:/run/secrets/ts_authkey"
       TAILSCALE_USE_WIP_CODE: "1"
     volumes:
       - /srv/tsidp/data:/var/lib/tsidp
