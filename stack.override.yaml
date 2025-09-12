@@ -101,9 +101,17 @@ services:
     env_file: stack.env
     network_mode: service:server-ts
     ports: !reset []
+    volumes: !override
+      - /srv/authentik/media:/media
+      - /srv/authentik/custom-templates:/templates
     #  - default
     #  - external
   worker:
+    volumes: !override
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /srv/authentik/media:/media
+      - /srv/authentik/certs:/certs
+      - /srv/authentik/custom-templates:/templates
     env_file: stack.env
   #    networks:
   #      - default
@@ -144,3 +152,13 @@ services:
       AUTHENTIK_TOKEN: ${AUTHENTIK_TOKEN:?AUTHENTIK_TOKEN is not set}
 
       #- "traefik.http.routers.authentik-proxy.entrypoints=websecure"
+  npm:
+    image: 'jc21/nginx-proxy-manager:latest'
+    restart: unless-stopped
+    ports:
+      - '80:80'
+      - '81:81'
+      - '443:443'
+    volumes:
+      - /srv/npm/data:/data
+      - /srv/npm/letsencrypt:/etc/letsencrypt
