@@ -114,7 +114,7 @@ services:
       TAILSCALE_USE_WIP_CODE: "1"
     volumes:
       - /srv/tsidp/data:/var/lib/tsidp
-    image: ghcr.io/perchnet/tsidp:latest
+    image: ghcr.io/perchnet/tsidp-arm:latest
     command: tsidp --hostname=tsidp --dir=/var/lib/tsidp
 
   acme-redirect:
