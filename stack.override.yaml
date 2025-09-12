@@ -14,28 +14,7 @@ configs:
               "$${TS_CERT_DOMAIN}:443": {
                   "Handlers": {
                       "/": {
-                          "Proxy": "http://localhost:9000"
-                      }
-                  }
-              }
-          },
-          "AllowFunnel": {
-              "$${TS_CERT_DOMAIN}:443": true
-          }
-      }
-  proxy_serve:
-    content: |
-      {
-          "TCP": {
-              "443": {
-                  "HTTPS": true
-              }
-          },
-          "Web": {
-              "$${TS_CERT_DOMAIN}:443": {
-                  "Handlers": {
-                      "/": {
-                          "Proxy": "https+insecure://localhost:9443"
+                          "Proxy": "http://localhost:${COMPOSE_PORT_HTTP:-9000}"
                       }
                   }
               }
@@ -55,10 +34,6 @@ x-ts-sidecar: &ts-sidecar
     TS_ENABLE_HEALTH_CHECK: true
     TS_LOCAL_ADDR_PORT: 127.0.0.1:41234
     TS_STATE: "mem:"
-    #TS_SERVE_CONFIG: /config/serve.json
-    #TS_HOSTNAME: generic-sidecar
-  #    ports:
-  #      - "8120"
   devices:
     - /dev/net/tun:/dev/net/tun # Network configuration for Tailscale to work
   cap_add:
@@ -74,9 +49,6 @@ x-ts-sidecar: &ts-sidecar
 
 networks:
   default:
-#  external:
-#    name: traefik
-#    external: true
 
 services:
   postgresql:
@@ -104,8 +76,6 @@ services:
     volumes: !override
       - /srv/authentik/media:/media
       - /srv/authentik/custom-templates:/templates
-    #  - default
-    #  - external
   worker:
     volumes: !override
       - /var/run/docker.sock:/var/run/docker.sock
@@ -113,52 +83,13 @@ services:
       - /srv/authentik/certs:/certs
       - /srv/authentik/custom-templates:/templates
     env_file: stack.env
-  #    networks:
-  #      - default
-  #      #- external
-  proxy-ts:
-    <<: *ts-sidecar
-    environment:
-      <<: *ts-env
-      TS_HOSTNAME: "authentik-proxy"
-      TS_SERVE_CONFIG: /config/ts_serve.json
-    configs:
-      - source: proxy_serve
-        target: /config/ts_serve.json
-    #ports:
-    #  - 9000:9000
-    #  - 9443:9443
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.authentik-proxy.rule=PathPrefix(`/outpost.goauthentik.io/`)"
-      - traefik.http.middlewares.authentik-auth.forwardauth.address=http://authentik-proxy.shark-perch.ts.net:9000/outpost.goauthentik.io/auth/traefik
-      - traefik.http.middlewares.authentik-auth.forwardauth.trustForwardHeader=true
-      - traefik.http.middlewares.authentik-auth.forwardauth.authResponseHeaders=X-authentik-username,X-authentik-groups,X-authentik-entitlements,X-authentik-email,X-authentik-name,X-authentik-uid,X-authentik-jwt,X-authentik-meta-jwks,X-authentik-meta-outpost,X-authentik-meta-provider,X-authentik-meta-app,X-authentik-meta-version
-      - traefik.http.services.authentik-proxy.loadbalancer.server.port=${COMPOSE_PORT_HTTP:-9000}:9000
-  proxy:
-    container_name: authentik-proxy.internal
-    network_mode: service:proxy-ts
-    #networks:
-    #  - default
-    #  - external
-    #ports:
-    #  - 9000:9000
-    #  - 9443:9443
-    image: ghcr.io/goauthentik/proxy:${AUTHENTIK_TAG:-2025.4.1}
-    restart: unless-stopped
-    environment:
-      AUTHENTIK_HOST: http://authentik.shark-perch.ts.net:29000
-      AUTHENTIK_INSECURE: "true"
-      AUTHENTIK_TOKEN: ${AUTHENTIK_TOKEN:?AUTHENTIK_TOKEN is not set}
-
-      #- "traefik.http.routers.authentik-proxy.entrypoints=websecure"
-  npm:
-    image: 'jc21/nginx-proxy-manager:latest'
-    restart: unless-stopped
-    ports:
-      - '80:80'
-      - '81:81'
-      - '443:443'
+  acme-sh:
+    image: neilpang/acme.sh
+    container_name: acme.sh
     volumes:
-      - /srv/npm/data:/data
-      - /srv/npm/letsencrypt:/etc/letsencrypt
+      - /srv/acme.sh:/acme.sh
+    network_mode: host
+    command: daemon
+    stdin_open: true
+    tty: true
+    restart: always
