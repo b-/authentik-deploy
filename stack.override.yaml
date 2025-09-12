@@ -11,10 +11,15 @@ configs:
   acme-redirect-domain.conf:
     content: |
       [cert]
-      name = "auth-01.ibeep.com"
+      name = "auth.ibeep.com"
       dns_names = [
         "auth.ibeep.com",
         "auth-01.ibeep.com",
+      ]
+      exec = [
+        "mkdir -p /srv/authentik/certs/auth.ibeep.com"
+        "cp -v /srv/acme-redirect/data/live/auth.ibeep.com/fullchain /srv/authentik/certs/auth.ibeep.com/fullchain.pem"
+        "cp -v /srv/acme-redirect/data/live/auth.ibeep.com/privkey /srv/authentik/certs/auth.ibeep.com/privkey.pem"
       ]
   server_serve:
     content: |
@@ -93,7 +98,7 @@ services:
   worker:
     volumes: !override
       - /var/run/docker.sock:/var/run/docker.sock
-      - /certs:/certs
+      - /srv/authentik/certs:/certs
       - /srv/authentik/media:/media
       - /srv/authentik/custom-templates:/templates
     env_file: stack.env
@@ -103,9 +108,10 @@ services:
     build: https://github.com/kpcyrd/acme-redirect.git#main
     command: daemon -vvv
     environment:
-      ACME_DATA_DIR: /certs
+      ACME_DATA_DIR: /srv/acme-redirect/data
     volumes:
-      - /certs:/certs
+      - /srv/authentik/certs:/srv/authentik/certs
+      - /srv/acme-redirect/data:/srv/acme-redirect/data
       - /srv/acme-redirect/challs:/run/acme-redirect/challs
     ports:
       - 80:80
