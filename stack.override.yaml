@@ -105,6 +105,18 @@ services:
       - /srv/authentik/custom-templates/custom-css.css:/web/dist/custom.css
     env_file: stack.env
 
+    tsidp:
+      container_name: tsidp
+      #ports:
+      #    - 443:443
+      environment:
+        TS_AUTHKEY: "file:/run/secrets/ts_authkey"
+        TAILSCALE_USE_WIP_CODE: "1"
+      volumes:
+        - /srv/tsidp/data:/var/lib/tsidp
+      image: ghcr.io/perchnet/tsidp:latest
+      command: tsidp --hostname=tsidp --dir=/var/lib/tsidp
+
   acme-redirect:
     #image: ghcr.io/kpcyrd/acme-redirect:latest
     build: https://github.com/kpcyrd/acme-redirect.git#main
