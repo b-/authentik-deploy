@@ -17,9 +17,9 @@ configs:
         "auth-01.ibeep.com",
       ]
       exec = [
-        "mkdir -p /srv/authentik/certs/auth.ibeep.com"
-        "cp -v /srv/acme-redirect/data/live/auth.ibeep.com/fullchain /srv/authentik/certs/auth.ibeep.com/fullchain.pem"
-        "cp -v /srv/acme-redirect/data/live/auth.ibeep.com/privkey /srv/authentik/certs/auth.ibeep.com/privkey.pem"
+        "mkdir -p /srv/authentik/certs/auth.ibeep.com",
+        "cp -v /srv/acme-redirect/data/live/auth.ibeep.com/fullchain /srv/authentik/certs/auth.ibeep.com/fullchain.pem",
+        "cp -v /srv/acme-redirect/data/live/auth.ibeep.com/privkey /srv/authentik/certs/auth.ibeep.com/privkey.pem",
       ]
   server_serve:
     content: |
