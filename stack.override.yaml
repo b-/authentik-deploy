@@ -101,12 +101,12 @@ services:
   acme-redirect:
     #image: ghcr.io/kpcyrd/acme-redirect:latest
     build: https://github.com/kpcyrd/acme-redirect.git#main
-    command: daemon -vvv
+    command: daemon -vvvv
     volumes:
       - /srv/authentik/certs:/var/lib/acme-redirect
       - /srv/acme-redirect/challs:/run/acme-redirect/challs
     ports:
-      - 80
+      - 80:80
     configs:
       - source: acme-redirect.conf
         target: /etc/acme-redirect.conf
