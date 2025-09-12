@@ -6,7 +6,7 @@ configs:
     content: |
       [acme]
       acme_email = "certs@ibeep.com"
-      acme_url = "https://acme-staging-v02.api.letsencrypt.org/directory"
+      #acme_url = "https://acme-staging-v02.api.letsencrypt.org/directory"
       renew_if_days_left = 30
   acme-redirect-domain.conf:
     content: |
