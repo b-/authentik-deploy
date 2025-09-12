@@ -101,7 +101,7 @@ services:
   acme-redirect:
     #image: ghcr.io/kpcyrd/acme-redirect:latest
     build: https://github.com/kpcyrd/acme-redirect.git#main
-    command: daemon -v
+    command: daemon -vvv
     volumes:
       - /srv/authentik/certs:/var/lib/acme-redirect
       - /srv/acme-redirect/challs:/run/acme-redirect/challs
