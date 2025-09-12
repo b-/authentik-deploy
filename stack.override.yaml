@@ -95,12 +95,14 @@ services:
     volumes: !override
       - /srv/authentik/media:/media
       - /srv/authentik/custom-templates:/templates
+      - /srv/authentik/custom-templates/custom-css.css:/web/dist/custom.css
   worker:
     volumes: !override
       - /var/run/docker.sock:/var/run/docker.sock
       - /srv/authentik/certs:/certs
       - /srv/authentik/media:/media
       - /srv/authentik/custom-templates:/templates
+      - /srv/authentik/custom-templates/custom-css.css:/web/dist/custom.css
     env_file: stack.env
 
   acme-redirect:
