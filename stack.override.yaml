@@ -104,7 +104,9 @@ services:
     command: daemon -v
     volumes:
       - /srv/authentik/certs:/var/lib/acme-redirect
-      - /run/acme-redirect:/run/acme-redirect
+      - /srv/acme-redirect/challs:/run/acme-redirect/challs
+    ports:
+      - 80
     configs:
       - source: acme-redirect.conf
         target: /etc/acme-redirect.conf
