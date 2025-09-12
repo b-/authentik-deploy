@@ -99,7 +99,8 @@ services:
     env_file: stack.env
 
   acme-redirect:
-    image: ghcr.io/kpcyrd/acme-redirect:latest
+    #image: ghcr.io/kpcyrd/acme-redirect:latest
+    build: https://github.com/kpcyrd/acme-redirect.git#main
     volumes:
       - /srv/authentik/certs:/var/lib/acme-redirect
     configs:
