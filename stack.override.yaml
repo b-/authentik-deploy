@@ -119,7 +119,7 @@ services:
     volumes:
       - /srv/tsidp/data:/var/lib/tsidp
     image: docker.io/tailscale/tsidp:unstable
-    command: tsidp --verbose --hostname=tsidp --dir=/var/lib/tsidp --allow-insecure-registration=false
+    command: tsidp --hostname=tsidp --dir=/var/lib/tsidp --allow-insecure-registration=false
 
   acme-redirect:
     #image: ghcr.io/kpcyrd/acme-redirect:latest
