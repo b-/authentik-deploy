@@ -35,7 +35,7 @@ configs:
               "$${TS_CERT_DOMAIN}:443": {
                   "Handlers": {
                       "/": {
-                          "Proxy": "https+insecure://localhost:443"
+                          "Proxy": "https+insecure://localhost:9443"
                       }
                   }
               }
@@ -79,7 +79,7 @@ services:
       - "${COMPOSE_PORT_HTTPS:-9443}:9443"
     environment:
       <<: *ts-env
-      TS_HOSTNAME: "authentik"
+      TS_HOSTNAME: "auth"
       TS_SERVE_CONFIG: /config/ts_serve.json
     configs:
       - source: server_serve
