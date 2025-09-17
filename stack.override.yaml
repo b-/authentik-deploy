@@ -35,7 +35,7 @@ configs:
               "$${TS_CERT_DOMAIN}:443": {
                   "Handlers": {
                       "/": {
-                          "Proxy": "http://localhost:${COMPOSE_PORT_HTTP:-9000}"
+                          "Proxy": "https+insecure://localhost:443"
                       }
                   }
               }
@@ -44,32 +44,30 @@ configs:
               "$${TS_CERT_DOMAIN}:443": true
           }
       }
-x-ts-sidecar: &ts-sidecar
-  image: tailscale/tailscale:latest
-  secrets:
-    - ts_authkey
-  environment: &ts-env
-    TS_AUTHKEY: "file:/run/secrets/ts_authkey"
-    TS_EXTRA_ARGS: "--advertise-tags=tag:docker"
-    TS_USERSPACE: false
-    TS_ENABLE_HEALTH_CHECK: true
-    TS_LOCAL_ADDR_PORT: 127.0.0.1:41234
-    TS_STATE: "mem:"
-  devices:
-    - /dev/net/tun:/dev/net/tun # Network configuration for Tailscale to work
-  cap_add:
-    - net_admin # Tailscale requirement
-    - sys_module # Tailscale requirement
-  healthcheck:
-    test: ["CMD", "wget", "--spider", "-q", "http://127.0.0.1:41234/healthz"] # Check Tailscale has a Tailnet IP and is operational
-    interval: 1m # How often to perform the check
-    timeout: 10s # Time to wait for the check to succeed
-    retries: 3 # Number of retries before marking as unhealthy
-    start_period: 10s # Time to wait before starting health checks
-  restart: always
-
-networks:
-  default:
+x-service_templates:
+  x-ts-sidecar: &ts-sidecar
+    image: tailscale/tailscale:latest
+    secrets:
+      - ts_authkey
+    environment: &ts-env
+      TS_AUTHKEY: "file:/run/secrets/ts_authkey"
+      TS_EXTRA_ARGS: "--advertise-tags=tag:docker"
+      TS_ENABLE_HEALTH_CHECK: true
+      TS_LOCAL_ADDR_PORT: 127.0.0.1:41234
+      TS_STATE: "mem:"
+    #   TS_USERSPACE: false
+    # devices:
+    #   - /dev/net/tun:/dev/net/tun # Network configuration for Tailscale to work
+    # cap_add:
+    #   - net_admin # Tailscale requirement
+    #   - sys_module # Tailscale requirement
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://127.0.0.1:41234/healthz"] # Check Tailscale has a Tailnet IP and is operational
+      interval: 1m # How often to perform the check
+      timeout: 10s # Time to wait for the check to succeed
+      retries: 3 # Number of retries before marking as unhealthy
+      start_period: 10s # Time to wait before starting health checks
+    restart: always
 
 services:
   postgresql:
