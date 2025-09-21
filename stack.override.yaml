@@ -116,7 +116,7 @@ services:
     volumes:
       - /srv/tsidp/data:/var/lib/tsidp
     image: ghcr.io/tailscale/tsidp:latest
-    command: tsidp-server --funnel --enable-debug --verbose --hostname tsidp
+    command: tsidp-server --funnel --enable-debug --verbose --hostname=tsidp
 
   acme-redirect:
     #image: ghcr.io/kpcyrd/acme-redirect:latest
