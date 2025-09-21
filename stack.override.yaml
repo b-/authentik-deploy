@@ -111,7 +111,6 @@ services:
     #    - 443:443
     environment:
       TS_AUTHKEY: "${TSIDP_AUTHKEY}"
-      #TS_AUTHKEY: "tskey-auth-k5VpKRhosT11CNTRL-bfjm4PSk7DEwThoHiERM7EtxtDnVQzgk"
       TS_STATE_DIR: /var/lib/tsidp
       TAILSCALE_USE_WIP_CODE: "1"
     volumes:
