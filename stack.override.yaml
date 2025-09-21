@@ -106,18 +106,18 @@ services:
     env_file: stack.env
 
   tsidp:
-    secrets:
-      - tsidp_authkey
     container_name: tsidp
     #ports:
     #    - 443:443
     environment:
       TS_AUTHKEY: "${TSIDP_AUTHKEY}"
+      #TS_AUTHKEY: "tskey-auth-k5VpKRhosT11CNTRL-bfjm4PSk7DEwThoHiERM7EtxtDnVQzgk"
+      TS_STATE_DIR: /var/lib/tsidp
       TAILSCALE_USE_WIP_CODE: "1"
     volumes:
       - /srv/tsidp/data:/var/lib/tsidp
-    image: docker.io/tailscale/tsidp:unstable
-    command: tsidp --hostname=tsidp --dir=/var/lib/tsidp --allow-insecure-registration=false
+    image: ghcr.io/tailscale/tsidp:latest
+    command: tsidp-server --funnel --enable-debug --verbose --hostname tsidp
 
   acme-redirect:
     #image: ghcr.io/kpcyrd/acme-redirect:latest
