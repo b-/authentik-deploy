@@ -95,14 +95,14 @@ services:
     volumes: !override
       - /srv/authentik/media:/media
       - /srv/authentik/custom-templates:/templates
-      - /srv/authentik/custom-templates/custom-css.css:/web/dist/custom.css
+      #- /srv/authentik/custom-templates/custom-css.css:/web/dist/custom.css
   worker:
     volumes: !override
       - /var/run/docker.sock:/var/run/docker.sock
       - /srv/authentik/certs:/certs
       - /srv/authentik/media:/media
       - /srv/authentik/custom-templates:/templates
-      - /srv/authentik/custom-templates/custom-css.css:/web/dist/custom.css
+      #- /srv/authentik/custom-templates/custom-css.css:/web/dist/custom.css
     env_file: stack.env
 
   tsidp:
@@ -113,11 +113,14 @@ services:
       TS_AUTHKEY: "${TSIDP_AUTHKEY}"
       TS_HOSTNAME: tsidp
       TS_STATE_DIR: /var/lib/tsidp
+      TSIDP_USE_FUNNEL: "1"
+      TSIDP_ENABLE_STS: "1"
+      TSIDP_ENABLE_VERBOSE: "1"
+      TSIDP_ENABLE_DEBUG: "1"
       TAILSCALE_USE_WIP_CODE: "1"
     volumes:
       - /srv/tsidp/data:/var/lib/tsidp
-    image: ghcr.io/tailscale/tsidp:latest
-    command: tsidp-server --funnel --enable-debug --verbose --hostname=tsidp
+    image: ghcr.io/tailscale/tsidp:v0.0.2 # not pinned to latest because we're expecting more breaking changes
 
   acme-redirect:
     #image: ghcr.io/kpcyrd/acme-redirect:latest
