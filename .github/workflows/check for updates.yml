@@ -1,7 +1,7 @@
 name: Check for update
 env:
   #URL: "https://raw.githubusercontent.com/goauthentik/authentik/master/docker-compose.yml"
-  URL: "https://goauthentik.io/docker-compose.yml"
+  URL: "https://docs.goauthentik.io/docker-compose.yml"
   FILE: "docker-compose.yml"
 on:
   push:
