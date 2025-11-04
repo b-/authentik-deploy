@@ -120,7 +120,8 @@ services:
       TAILSCALE_USE_WIP_CODE: "1"
     volumes:
       - /srv/tsidp/data:/var/lib/tsidp
-    image: ghcr.io/tailscale/tsidp:v0.0.2 # not pinned to latest because we're expecting more breaking changes
+    image: ghcr.io/tailscale/tsidp:v0.0.6 # not pinned to latest because we're expecting more breaking changes
+    user: "0:0"
 
   acme-redirect:
     #image: ghcr.io/kpcyrd/acme-redirect:latest
