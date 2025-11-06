@@ -122,9 +122,11 @@ services:
       - /srv/tsidp/data:/var/lib/tsidp
     image: ghcr.io/tailscale/tsidp:v0.0.6 # not pinned to latest because we're expecting more breaking changes
     user: "0:0"
+    restart: always
 
   acme-redirect:
     #image: ghcr.io/kpcyrd/acme-redirect:latest
+    restart: always
     build: https://github.com/kpcyrd/acme-redirect.git#main
     command: daemon -vvv
     environment:
