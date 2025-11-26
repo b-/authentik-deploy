@@ -1,7 +1,7 @@
 ---
 services:
   backup:
-    env_file: stack.env
+    env_file: .env
     image: prodrigestivill/postgres-backup-local:16
     restart: always
     environment:

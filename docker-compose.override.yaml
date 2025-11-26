@@ -70,8 +70,6 @@ x-service_templates:
     restart: always
 
 services:
-  postgresql:
-    env_file: stack.env
   server-ts:
     <<: *ts-sidecar
     ports:
@@ -89,7 +87,6 @@ services:
       - "traefik.http.routers.authentik.rule=${TRAEFIK_RULE_PREFIX}auth${TRAEFIK_RULE_SUFFIX}"
       - "traefik.http.services.authentik.loadbalancer.server.port=${COMPOSE_PORT_HTTP:-9000}:9000"
   server:
-    env_file: stack.env
     network_mode: service:server-ts
     ports: !reset []
     volumes: !override
@@ -103,7 +100,6 @@ services:
       - /srv/authentik/media:/media
       - /srv/authentik/custom-templates:/templates
       #- /srv/authentik/custom-templates/custom-css.css:/web/dist/custom.css
-    env_file: stack.env
 
   tsidp:
     container_name: tsidp
