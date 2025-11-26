@@ -11,9 +11,7 @@ links = [
 project_name = "authentik_live"
 poll_for_updates = true
 destroy_before_deploy = true
-git_account = "b-"
-repo = "b-/authentik-deploy"
-branch = "komodo"
+linked_repo = "authentik-deploy"
 file_paths = [
   "docker-compose.yml",
   "stack.override.yaml",
@@ -42,6 +40,18 @@ TRAEFIK_RULE_SUFFIX=[[OP__KOMODO__TRAEFIK__RULE_SUFFIX]]
 TS_AUTHKEY=[[OP__KOMODO__TAILSCALE_OP__CLIENT_SECRET]]?ephemeral=true
 TSIDP_AUTHKEY=[[TSIDP_KEY]]
 """
+
+##
+
+[[repo]]
+name = "authentik-deploy"
+tags = ["authentik"]
+[repo.config]
+server = "auth"
+builder = "auth"
+git_account = "b-"
+repo = "b-/authentik-deploy"
+branch = "komodo"
 
 ##
 
