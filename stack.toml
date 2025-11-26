@@ -1,4 +1,20 @@
 [[stack]]
+name = "socket-proxy"
+tags = ["authentik"]
+[stack.config]
+server = "komodo"
+poll_for_updates = true
+destroy_before_deploy = true
+linked_repo = "authentik-deploy"
+run_directory = "socket-proxy"
+file_paths = [
+  "compose.yaml"
+]
+environment = """
+TS_AUTHKEY=[[OP__KOMODO__TAILSCALE_OP__CLIENT_SECRET]]?ephemeral=true
+"""
+
+[[stack]]
 name = "authentik"
 tags = ["authentik"]
 [stack.config]

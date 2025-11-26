@@ -1,0 +1,74 @@
+---
+services:
+  socket-proxy:
+    network_mode: service:ts-sidecar
+    image: lscr.io/linuxserver/socket-proxy:latest
+    container_name: socket-proxy
+    environment:
+      - ALLOW_START=1 #optional
+      - ALLOW_STOP=1 #optional
+      - ALLOW_RESTARTS=1 #optional
+      - AUTH=1 #optional
+      - BUILD=1 #optional
+      - COMMIT=1 #optional
+      - CONFIGS=1 #optional
+      - CONTAINERS=1 #optional
+      - DISABLE_IPV6=0 #optional
+      - DISTRIBUTION=1 #optional
+      - EVENTS=2 #optional
+      - EXEC=1 #optional
+      - IMAGES=1 #optional
+      - INFO=1 #optional
+      - LOG_LEVEL=info #optional
+      - NETWORKS=1 #optional
+      - NODES=1 #optional
+      - PING=1 #optional
+      - PLUGINS=1 #optional
+      - POST=1 #optional
+      - SECRETS=1 #optional
+      - SERVICES=1 #optional
+      - SESSION=1 #optional
+      - SWARM=1 #optional
+      - SYSTEM=1 #optional
+      - TASKS=1 #optional
+      - VERSION=1 #optional
+      - VOLUMES=1 #optional
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /run
+  ts-sidecar:
+    image: tailscale/tailscale:latest
+    secrets:
+      - ts_authkey
+    ports:
+      - "2375:2375"
+    environment: &ts-env
+      TS_AUTHKEY: "file:/run/secrets/ts_authkey"
+      TS_EXTRA_ARGS: "--advertise-tags=tag:docker"
+      TS_ENABLE_HEALTH_CHECK: true
+      TS_LOCAL_ADDR_PORT: 127.0.0.1:41234
+      TS_STATE: "mem:"
+      TS_HOSTNAME: "socket-proxy"
+    #   TS_USERSPACE: false
+    # devices:
+    #   - /dev/net/tun:/dev/net/tun # Network configuration for Tailscale to work
+    # cap_add:
+    #   - net_admin # Tailscale requirement
+    #   - sys_module # Tailscale requirement
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://127.0.0.1:41234/healthz"] # Check Tailscale has a Tailnet IP and is operational
+      interval: 1m # How often to perform the check
+      timeout: 10s # Time to wait for the check to succeed
+      retries: 3 # Number of retries before marking as unhealthy
+      start_period: 10s # Time to wait before starting health checks
+    restart: always
+
+secrets:
+  ts_authkey:
+    environment: "TS_AUTHKEY"
+  tsidp_authkey:
+    environment: "TSIDP_AUTHKEY"
+
