@@ -1,8 +1,8 @@
 [[stack]]
-name = "socket-proxy"
+name = "authentik-socket-proxy"
 tags = ["authentik"]
 [stack.config]
-server = "komodo"
+server = "localhost"
 poll_for_updates = true
 destroy_before_deploy = true
 linked_repo = "authentik-deploy"
@@ -81,5 +81,5 @@ enabled = true
 executions = [
   { execution.type = "CloneRepo", execution.params.repo = "authentik-deploy", enabled = true },
   { execution.type = "RunSync", execution.params.sync = "authentik-sync", enabled = true },
-  { execution.type = "DeployStackIfChanged", execution.params.stack = "authentik", enabled = true }
+  { execution.type = "BatchDeployStackIfChanged", execution.params.pattern = "authentik-*", enabled = true }
 ]
