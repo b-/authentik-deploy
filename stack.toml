@@ -4,9 +4,9 @@ tags = ["authentik"]
 [stack.config]
 server = "auth"
 links = [
-    "https://github.com/b-/authentik-deploy",
-    "https://auth.shark-perch.ts.net",
-    "https://auth.ibeep.com",
+  "https://github.com/b-/authentik-deploy",
+  "https://auth.shark-perch.ts.net",
+  "https://auth.ibeep.com"
 ]
 project_name = "authentik_live"
 poll_for_updates = true
@@ -15,10 +15,9 @@ git_account = "b-"
 repo = "b-/authentik-deploy"
 branch = "komodo"
 file_paths = [
-    "docker-compose.yml",
-    "stack.override.yaml",
-    "backup.yaml",
-    #"init.yaml",
+  "docker-compose.yml",
+  "stack.override.yaml",
+  "backup.yaml"
 ]
 env_file_path = "stack.env"
 environment = """
@@ -43,3 +42,18 @@ TRAEFIK_RULE_SUFFIX=[[OP__KOMODO__TRAEFIK__RULE_SUFFIX]]
 TS_AUTHKEY=[[OP__KOMODO__TAILSCALE_OP__CLIENT_SECRET]]?ephemeral=true
 TSIDP_AUTHKEY=[[TSIDP_KEY]]
 """
+
+##
+
+[[procedure]]
+name = "deploy-authentik"
+tags = ["authentik"]
+
+[[procedure.config.stage]]
+name = "update repo"
+enabled = true
+executions = [
+  { execution.type = "CloneRepo", execution.params.repo = "authentik-deploy", enabled = true },
+  { execution.type = "RunSync", execution.params.sync = "authentik-sync", enabled = true },
+  { execution.type = "DeployStackIfChanged", execution.params.stack = "authentik", enabled = true }
+]
