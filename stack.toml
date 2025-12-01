@@ -1,20 +1,4 @@
 [[stack]]
-name = "authentik-socket-proxy"
-tags = ["authentik"]
-[stack.config]
-server = "localhost"
-poll_for_updates = true
-destroy_before_deploy = true
-linked_repo = "authentik-deploy"
-run_directory = "socket-proxy"
-file_paths = [
-  "compose.yaml"
-]
-environment = """
-TS_AUTHKEY=[[OP__KOMODO__TAILSCALE_OP__CLIENT_SECRET]]?ephemeral=true
-"""
-
-[[stack]]
 name = "authentik"
 tags = ["authentik"]
 [stack.config]
@@ -33,7 +17,6 @@ file_paths = [
   "docker-compose.override.yaml",
   "backup.yaml"
 ]
-env_file_path = ".env"
 environment = """
 PG_USER=authentik
 PG_PASS=[[OP__KOMODO__AUTHENTIK__PG_PASS]]
@@ -55,6 +38,22 @@ TRAEFIK_RULE_PREFIX=[[OP__KOMODO__TRAEFIK__RULE_PREFIX]]
 TRAEFIK_RULE_SUFFIX=[[OP__KOMODO__TRAEFIK__RULE_SUFFIX]]
 TS_AUTHKEY=[[OP__KOMODO__TAILSCALE_OP__CLIENT_SECRET]]?ephemeral=true
 TSIDP_AUTHKEY=[[TSIDP_KEY]]
+"""
+
+##
+
+[[stack]]
+name = "authentik-socket-proxy"
+tags = ["authentik"]
+[stack.config]
+server = "localhost"
+poll_for_updates = true
+destroy_before_deploy = true
+linked_repo = "authentik-deploy"
+run_directory = "socket-proxy"
+file_paths = ["compose.yaml"]
+environment = """
+TS_AUTHKEY=[[OP__KOMODO__TAILSCALE_OP__CLIENT_SECRET]]?ephemeral=true
 """
 
 ##
@@ -81,5 +80,5 @@ enabled = true
 executions = [
   { execution.type = "CloneRepo", execution.params.repo = "authentik-deploy", enabled = true },
   { execution.type = "RunSync", execution.params.sync = "authentik-sync", enabled = true },
-  { execution.type = "BatchDeployStackIfChanged", execution.params.pattern = "authentik-*", enabled = true }
+  { execution.type = "BatchDeploy", execution.params.pattern = "authentik-*", enabled = true }
 ]
