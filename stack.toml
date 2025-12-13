@@ -33,6 +33,7 @@ file_paths = [
   "docker-compose.override.yaml",
   "backup.yaml"
 ]
+ignore_services = ["certbot"]
 environment = """
 PG_USER=authentik
 PG_PASS=[[OP__KOMODO__AUTHENTIK__PG_PASS]]
