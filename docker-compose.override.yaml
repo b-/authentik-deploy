@@ -122,6 +122,8 @@ services:
     image: certbot/certbot:latest
     volumes:
         - /srv/authentik/certs/:/etc/letsencrypt
+    ports:
+      - 80:80
     command:
         - certonly
         - --non-interactive
