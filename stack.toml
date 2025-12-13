@@ -78,7 +78,7 @@ tags = ["authentik"]
 name = "update repo"
 enabled = true
 executions = [
-  { execution.type = "CloneRepo", execution.params.repo = "authentik-deploy", enabled = true },
+  { execution.type = "CloneRepo", execution.params.repo = "authentik-deploy", enabled = false },
   { execution.type = "RunSync", execution.params.sync = "authentik-sync", enabled = true },
   { execution.type = "BatchDeployStack", execution.params.pattern = "authentik-*", enabled = true }
 ]
