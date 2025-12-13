@@ -118,8 +118,22 @@ services:
     volumes:
       - /srv/tsidp/data:/var/lib/tsidp
     image: ghcr.io/tailscale/tsidp:v0.0.9 # not pinned to latest because we're expecting more breaking changes
+  certbot:
+    image: certbot/certbot:latest
+    volumes:
+        - /srv/authentik/certs/:/etc/letsencrypt
+    command:
+        - certonly
+        - --non-interactive
+        - --agree-tos
+        # Replace your@email.com with the email you wish to use
+        - -m letsencrypt@ibeep.com
+        - --standalone
+        - -d auth.ibeep.com -d auth-01.ibeep.com
 
   acme-redirect:
+    deploy:
+      replicas: 0 # disable
     #image: ghcr.io/kpcyrd/acme-redirect:latest
     build: https://github.com/kpcyrd/acme-redirect.git#main
     command: daemon -vvv
