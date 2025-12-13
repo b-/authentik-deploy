@@ -119,6 +119,8 @@ services:
       - /srv/tsidp/data:/var/lib/tsidp
     image: ghcr.io/tailscale/tsidp:v0.0.9 # not pinned to latest because we're expecting more breaking changes
   certbot:
+    deploy:
+      replicas: 0 # disable
     image: certbot/certbot:latest
     volumes:
         - /srv/authentik/certs/:/etc/letsencrypt
@@ -135,17 +137,16 @@ services:
         - -d auth-01.ibeep.com
 
   acme-redirect:
-    deploy:
-      replicas: 0 # disable
     #image: ghcr.io/kpcyrd/acme-redirect:latest
     build: https://github.com/kpcyrd/acme-redirect.git#main
     command: daemon -vvv
     environment:
-      ACME_DATA_DIR: /srv/acme-redirect/data
+      ACME_DATA_DIR: /certs
     volumes:
       - /srv/authentik/certs:/srv/authentik/certs
       - /srv/acme-redirect/data:/srv/acme-redirect/data
       - /srv/acme-redirect/challs:/run/acme-redirect/challs
+      - certs:/certs
     ports:
       - 80:80
     configs:
