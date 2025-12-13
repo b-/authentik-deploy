@@ -129,7 +129,8 @@ services:
         # Replace your@email.com with the email you wish to use
         - -m letsencrypt@ibeep.com
         - --standalone
-        - -d auth.ibeep.com -d auth-01.ibeep.com
+        - -d auth.ibeep.com
+        - -d auth-01.ibeep.com
 
   acme-redirect:
     deploy:
