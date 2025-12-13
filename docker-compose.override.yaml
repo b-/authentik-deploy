@@ -92,7 +92,7 @@ services:
     volumes: !override
       - /srv/authentik/media:/media
       - /srv/authentik/custom-templates:/templates
-      - certs:/certs
+      - /srv/authentik/certs:/certs
       #- /srv/authentik/custom-templates/custom-css.css:/web/dist/custom.css
   worker:
     volumes: !override
