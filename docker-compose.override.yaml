@@ -90,12 +90,14 @@ services:
     network_mode: service:server-ts
     ports: !reset []
     volumes: !override
+      - /srv/authentik/data:/data
       - /srv/authentik/media:/media
       - /srv/authentik/custom-templates:/templates
       - /srv/authentik/certs:/certs
       #- /srv/authentik/custom-templates/custom-css.css:/web/dist/custom.css
   worker:
     volumes: !override
+      - /srv/authentik/data:/data
       - /var/run/docker.sock:/var/run/docker.sock
       - /srv/authentik/certs:/certs
       - /srv/authentik/media:/media
