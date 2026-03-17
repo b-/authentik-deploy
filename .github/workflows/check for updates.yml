@@ -5,6 +5,8 @@ env:
   FILE: "docker-compose.yml"
 on:
   push:
+    branches-ignore:
+      - update
   schedule:
     - cron: '0 */4 * * *' # every 4th hour
   workflow_dispatch:
