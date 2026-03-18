@@ -19,9 +19,12 @@ configs:
         "auth-01.ibeep.com",
       ]
       exec = [
+        "mkdir -p /srv/authentik/data/certs/auth.ibeep.com",
         "mkdir -p /srv/authentik/certs/auth.ibeep.com",
         "cp -fv /srv/acme-redirect/data/live/auth.ibeep.com/fullchain /srv/authentik/certs/auth.ibeep.com/fullchain.pem",
+        "cp -fv /srv/acme-redirect/data/live/auth.ibeep.com/fullchain /srv/authentik/data/certs/auth.ibeep.com/fullchain.pem",
         "cp -fv /srv/acme-redirect/data/live/auth.ibeep.com/privkey /srv/authentik/certs/auth.ibeep.com/privkey.pem",
+        "cp -fv /srv/acme-redirect/data/live/auth.ibeep.com/privkey /srv/authentik/data/certs/auth.ibeep.com/privkey.pem",
       ]
   server_serve:
     content: |
@@ -146,6 +149,7 @@ services:
     environment:
       ACME_DATA_DIR: /certs
     volumes:
+      - /srv/authentik/data:/srv/authentik/data
       - /srv/authentik/certs:/srv/authentik/certs
       - /srv/acme-redirect/data:/srv/acme-redirect/data
       - /srv/acme-redirect/challs:/run/acme-redirect/challs
