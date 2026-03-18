@@ -19,12 +19,10 @@ configs:
         "auth-01.ibeep.com",
       ]
       exec = [
-        "mkdir -p /srv/authentik/data/certs/auth.ibeep.com",
         "mkdir -p /srv/authentik/certs/auth.ibeep.com",
         "cp -fv /srv/acme-redirect/data/live/auth.ibeep.com/fullchain /srv/authentik/certs/auth.ibeep.com/fullchain.pem",
-        "cp -fv /srv/acme-redirect/data/live/auth.ibeep.com/fullchain /srv/authentik/data/certs/auth.ibeep.com/fullchain.pem",
-        "cp -fv /srv/acme-redirect/data/live/auth.ibeep.com/privkey /srv/authentik/certs/auth.ibeep.com/privkey.pem",
         "cp -fv /srv/acme-redirect/data/live/auth.ibeep.com/privkey /srv/authentik/data/certs/auth.ibeep.com/privkey.pem",
+        "chown -R 1000:1000 /srv/authentik/data/certs/auth.ibeep.com",
       ]
   server_serve:
     content: |
@@ -120,6 +118,7 @@ services:
       TSIDP_ENABLE_STS: "1"
       TSIDP_ENABLE_VERBOSE: "1"
       TSIDP_ENABLE_DEBUG: "1"
+      TSNET_FORCE_LOGIN: "1"
       TAILSCALE_USE_WIP_CODE: "1"
     volumes:
       - /srv/tsidp/data:/var/lib/tsidp
@@ -149,7 +148,6 @@ services:
     environment:
       ACME_DATA_DIR: /certs
     volumes:
-      - /srv/authentik/data:/srv/authentik/data
       - /srv/authentik/certs:/srv/authentik/certs
       - /srv/acme-redirect/data:/srv/acme-redirect/data
       - /srv/acme-redirect/challs:/run/acme-redirect/challs
