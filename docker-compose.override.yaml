@@ -20,8 +20,8 @@ configs:
       ]
       exec = [
         "mkdir -p /srv/authentik/certs/auth.ibeep.com",
-        "cp -fv /srv/acme-redirect/data/live/auth.ibeep.com/fullchain /srv/authentik/certs/auth.ibeep.com/fullchain.pem",
-        "cp -fv /srv/acme-redirect/data/live/auth.ibeep.com/privkey /srv/authentik/certs/auth.ibeep.com/privkey.pem",
+        "cp -fv /certs/live/auth.ibeep.com/fullchain /srv/authentik/certs/auth.ibeep.com/fullchain.pem",
+        "cp -fv /certs/live/auth.ibeep.com/privkey /srv/authentik/certs/auth.ibeep.com/privkey.pem",
         "chown -R 1000:1000 /srv/authentik/certs/auth.ibeep.com",
       ]
   server_serve:
