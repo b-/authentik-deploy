@@ -118,7 +118,8 @@ services:
       TSIDP_ENABLE_STS: "1"
       TSIDP_ENABLE_VERBOSE: "1"
       TSIDP_ENABLE_DEBUG: "1"
-      TSNET_FORCE_LOGIN: "1"
+      #TSNET_FORCE_LOGIN: "1"
+      TS_ADVERTISE_TAGS: "tag:tsidp"
       TAILSCALE_USE_WIP_CODE: "1"
     volumes:
       - /srv/tsidp/data:/var/lib/tsidp
