@@ -125,7 +125,7 @@ services:
       TAILSCALE_USE_WIP_CODE: "1"
     volumes:
       - /srv/tsidp/data:/var/lib/tsidp
-    image: ghcr.io/tailscale/tsidp:v0.0.12 # not pinned to latest because we're expecting more breaking changes
+    image: ghcr.io/tailscale/tsidp:v0.0.13 # not pinned to latest because we're expecting more breaking changes
   certbot:
     deploy:
       replicas: 0 # disable
