@@ -166,7 +166,6 @@ services:
     build: https://github.com/kpcyrd/acme-redirect.git#main
     entrypoint: sh
     command:
-      - sh
       - -c
       - |
         sleep 60
