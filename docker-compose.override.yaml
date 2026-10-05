@@ -164,6 +164,7 @@ services:
         target: /etc/acme-redirect.d/auth.ibeep.com.conf
   acme-redirect-renew:
     build: https://github.com/kpcyrd/acme-redirect.git#main
+    entrypoint: sh
     command:
       - sh
       - -c
