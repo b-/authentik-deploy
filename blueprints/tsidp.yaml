@@ -169,4 +169,9 @@ entries:
       group_property_mappings:
         - !KeyOf tsidp-group-mapping
       group_matching_mode: identifier
+      # OAuthSource validation requires these on every update for the generic
+      # OpenID Connect provider type, so restate the source's current values.
+      authorization_url: https://tsidp.shark-perch.ts.net/authorize
+      access_token_url: https://tsidp.shark-perch.ts.net/token
+      profile_url: https://tsidp.shark-perch.ts.net/userinfo
       authentication_flow: !KeyOf flow
