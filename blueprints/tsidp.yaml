@@ -4,13 +4,15 @@
 #
 # - User property mapping: copies tsidp's id_token-only claims into attributes.tsidp
 # - Group property mapping: plain group-per-claim, no name-linking to local groups
-# - tsidp-auth-only flow: Source Stage (+ reuse-connection policy) → User Write
-# - Patches the existing "Sign in with Tailscale" source (partial update; secrets untouched)
+# - tsidp-source-authentication flow: copy of default-source-authentication,
+#   plus User Write (+ reuse-connection policy) before User Login
+# - Patches the existing "Sign in with Tailscale" source to use the new flow
+#   (partial update; secrets untouched)
 version: 1
 metadata:
   name: tsidp - Sign in with Tailscale
   labels:
-    blueprints.goauthentik.io/description: tsidp source mappings + multi-tailnet auth flow
+    blueprints.goauthentik.io/description: tsidp source mappings + multi-tailnet source authentication flow
 context:
   # pk of the existing "Sign in with Tailscale" OAuth source
   source_pk: 6138678c-bf9f-4f10-815c-ad8660abe6a3
@@ -86,15 +88,15 @@ entries:
             pctx["goauthentik.io/sources/connection"] = existing
         return True
 
-  # ── Stages ──────────────────────────────────────────────────────────
-  - model: authentik_stages_source.sourcestage
-    id: tsidp-source-stage
+  # ── Flow: copy of default-source-authentication + tsidp bits ───────
+  - model: authentik_policies_expression.expressionpolicy
+    id: tsidp-if-sso
     identifiers:
-      name: Auth-TSIDP
+      name: tsidp-source-authentication-if-sso
     attrs:
-      source: !Context source_pk
-      resume_timeout: minutes=10
-      resume_on_match_failures: []
+      # same as default-source-authentication-if-sso: only reachable via a source
+      expression: |
+        return ak_is_sso_flow
 
   - model: authentik_stages_user_write.userwritestage
     id: tsidp-user-write
@@ -104,48 +106,57 @@ entries:
       # only update existing/linked users with mapped properties, never create
       user_creation_mode: never_create
 
-  # ── Flow ────────────────────────────────────────────────────────────
+  - model: authentik_stages_user_login.userloginstage
+    id: tsidp-user-login
+    identifiers:
+      name: tsidp-source-authentication-login
+
   - model: authentik_flows.flow
     id: flow
     identifiers:
-      slug: tsidp-auth-only
+      slug: tsidp-source-authentication
     attrs:
-      name: tsidp-auth-only
-      title: Checking Tailscale state
+      name: Welcome to authentik!
+      title: Welcome to authentik!
       designation: authentication
-      authentication: none
-      denied_action: message_continue
-      layout: stacked
-      policy_engine_mode: any
+      authentication: require_unauthenticated
 
-  - model: authentik_flows.flowstagebinding
-    id: tsidp-source-binding
+  - model: authentik_policies.policybinding
     identifiers:
       order: 0
-      stage: !KeyOf tsidp-source-stage
+      policy: !KeyOf tsidp-if-sso
       target: !KeyOf flow
     attrs:
-      # must run when the flow resumes after tsidp, not at plan time
-      evaluate_on_plan: false
-      re_evaluate_policies: true
-      invalid_response_action: retry
-      policy_engine_mode: any
+      negate: false
+      enabled: true
+      timeout: 30
 
   - model: authentik_flows.flowstagebinding
+    id: tsidp-user-write-binding
     identifiers:
-      order: 10
+      order: 0
       stage: !KeyOf tsidp-user-write
       target: !KeyOf flow
+    attrs:
+      # run against the live plan (connection is already in context), not at plan time
+      evaluate_on_plan: false
+      re_evaluate_policies: true
 
   - model: authentik_policies.policybinding
     identifiers:
       order: 0
       policy: !KeyOf tsidp-reuse-connection
-      target: !KeyOf tsidp-source-binding
+      target: !KeyOf tsidp-user-write-binding
     attrs:
       enabled: true
       failure_result: true  # never block login if the policy errors
       timeout: 30
+
+  - model: authentik_flows.flowstagebinding
+    identifiers:
+      order: 10
+      stage: !KeyOf tsidp-user-login
+      target: !KeyOf flow
 
   # ── Patch the existing source (partial update) ──────────────────────
   - model: authentik_sources_oauth.oauthsource
@@ -158,3 +169,4 @@ entries:
       group_property_mappings:
         - !KeyOf tsidp-group-mapping
       group_matching_mode: identifier
+      authentication_flow: !KeyOf flow
