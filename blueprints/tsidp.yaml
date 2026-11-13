@@ -13,9 +13,6 @@ metadata:
   name: tsidp - Sign in with Tailscale
   labels:
     blueprints.goauthentik.io/description: tsidp source mappings + multi-tailnet source authentication flow
-context:
-  # pk of the existing "Sign in with Tailscale" OAuth source
-  source_pk: 6138678c-bf9f-4f10-815c-ad8660abe6a3
 entries:
   # ── Property mappings ───────────────────────────────────────────────
   - model: authentik_sources_oauth.oauthsourcepropertymapping
@@ -161,7 +158,10 @@ entries:
   # ── Patch the existing source (partial update) ──────────────────────
   - model: authentik_sources_oauth.oauthsource
     identifiers:
-      pk: !Context source_pk
+      # pk of the existing "Sign in with Tailscale" OAuth source. Hardcoded:
+      # `!Context` resolved to None here, which made authentik try to create
+      # a brand-new source instead of patching this one.
+      pk: 6138678c-bf9f-4f10-815c-ad8660abe6a3
     attrs:
       # NB: these lists REPLACE the source's current mappings
       user_property_mappings:
