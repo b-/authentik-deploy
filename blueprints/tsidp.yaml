@@ -1,0 +1,160 @@
+# yaml-language-server: $schema=https://goauthentik.io/blueprints/schema.json
+#
+# tsidp ("Sign in with Tailscale") for authentik 2026.8.x
+#
+# - User property mapping: copies tsidp's id_token-only claims into attributes.tsidp
+# - Group property mapping: plain group-per-claim, no name-linking to local groups
+# - tsidp-auth-only flow: Source Stage (+ reuse-connection policy) → User Write
+# - Patches the existing "Sign in with Tailscale" source (partial update; secrets untouched)
+version: 1
+metadata:
+  name: tsidp - Sign in with Tailscale
+  labels:
+    blueprints.goauthentik.io/description: tsidp source mappings + multi-tailnet auth flow
+context:
+  # pk of the existing "Sign in with Tailscale" OAuth source
+  source_pk: 6138678c-bf9f-4f10-815c-ad8660abe6a3
+entries:
+  # ── Property mappings ───────────────────────────────────────────────
+  - model: authentik_sources_oauth.oauthsourcepropertymapping
+    id: tsidp-user-mapping
+    identifiers:
+      name: "tsidp: user claims"
+    attrs:
+      expression: |
+        # tsidp only puts node/tailnet claims in the id_token, not /userinfo,
+        # so decode it from the token response. Skipping signature verification
+        # is OK: authentik got it straight from tsidp's token endpoint over TLS.
+        import jwt  # PyJWT ships with authentik
+
+        raw = (token or {}).get("id_token")
+        if not raw:
+            return None
+        claims = jwt.decode(raw, options={"verify_signature": False})
+
+        # node/tailnet are omitted by tsidp when it can't see the device name
+        # (e.g. logins from tailnets tsidp is shared into), so fall back by uid.
+        UID_TAILNET = {
+            # 4750599723748100: "tailnet-b",
+        }
+        ts = {k: claims.get(k) for k in ("tailnet", "node", "nid", "addresses", "key", "uid")}
+        ts["tailnet"] = ts["tailnet"] or UID_TAILNET.get(ts["uid"], "shared/unknown")
+        return {"attributes": {"tsidp": ts}}
+
+  - model: authentik_sources_oauth.oauthsourcepropertymapping
+    id: tsidp-group-mapping
+    identifiers:
+      name: "tsidp: groups"
+    attrs:
+      expression: |
+        # group_id = each entry of the `groups` extraClaim from tsidp grants
+        return {
+            "name": group_id,
+            "attributes": {"tsidp_managed": True},
+        }
+
+  # ── Multi-tailnet fix: reuse the user's existing connection ─────────
+  - model: authentik_policies_expression.expressionpolicy
+    id: tsidp-reuse-connection
+    identifiers:
+      name: tsidp-reuse-connection
+    attrs:
+      execution_logging: true
+      expression: |
+        # tsidp's `sub` differs per tailnet, but authentik allows one connection
+        # per (user, source). When email-linking produced a *new* connection for a
+        # user who already has one, re-point the existing one instead of inserting.
+        # Last tailnet you logged in from "owns" the connection.
+        from authentik.sources.oauth.models import UserOAuthSourceConnection
+
+        plan = context.get("flow_plan")
+        if not plan:
+            return True
+        pctx = plan.context
+        new = pctx.get("goauthentik.io/sources/connection")
+        user = pctx.get("pending_user")
+        if not new or new.pk or not user:
+            return True  # already an existing connection, nothing to fix
+
+        existing = UserOAuthSourceConnection.objects.filter(user=user, source=new.source).first()
+        if existing:
+            ak_logger.info("tsidp: repointing connection", old=existing.identifier, new=new.identifier)
+            existing.identifier = new.identifier
+            for f in ("access_token", "refresh_token", "expires"):
+                if hasattr(new, f):
+                    setattr(existing, f, getattr(new, f))
+            pctx["goauthentik.io/sources/connection"] = existing
+        return True
+
+  # ── Stages ──────────────────────────────────────────────────────────
+  - model: authentik_stages_source.sourcestage
+    id: tsidp-source-stage
+    identifiers:
+      name: Auth-TSIDP
+    attrs:
+      source: !Context source_pk
+      resume_timeout: minutes=10
+      resume_on_match_failures: []
+
+  - model: authentik_stages_user_write.userwritestage
+    id: tsidp-user-write
+    identifiers:
+      name: tsidp-user-write
+    attrs:
+      # only update existing/linked users with mapped properties, never create
+      user_creation_mode: never_create
+
+  # ── Flow ────────────────────────────────────────────────────────────
+  - model: authentik_flows.flow
+    id: flow
+    identifiers:
+      slug: tsidp-auth-only
+    attrs:
+      name: tsidp-auth-only
+      title: Checking Tailscale state
+      designation: authentication
+      authentication: none
+      denied_action: message_continue
+      layout: stacked
+      policy_engine_mode: any
+
+  - model: authentik_flows.flowstagebinding
+    id: tsidp-source-binding
+    identifiers:
+      order: 0
+      stage: !KeyOf tsidp-source-stage
+      target: !KeyOf flow
+    attrs:
+      # must run when the flow resumes after tsidp, not at plan time
+      evaluate_on_plan: false
+      re_evaluate_policies: true
+      invalid_response_action: retry
+      policy_engine_mode: any
+
+  - model: authentik_flows.flowstagebinding
+    identifiers:
+      order: 10
+      stage: !KeyOf tsidp-user-write
+      target: !KeyOf flow
+
+  - model: authentik_policies.policybinding
+    identifiers:
+      order: 0
+      policy: !KeyOf tsidp-reuse-connection
+      target: !KeyOf tsidp-source-binding
+    attrs:
+      enabled: true
+      failure_result: true  # never block login if the policy errors
+      timeout: 30
+
+  # ── Patch the existing source (partial update) ──────────────────────
+  - model: authentik_sources_oauth.oauthsource
+    identifiers:
+      pk: !Context source_pk
+    attrs:
+      # NB: these lists REPLACE the source's current mappings
+      user_property_mappings:
+        - !KeyOf tsidp-user-mapping
+      group_property_mappings:
+        - !KeyOf tsidp-group-mapping
+      group_matching_mode: identifier

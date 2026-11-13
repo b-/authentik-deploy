@@ -95,6 +95,7 @@ services:
       - /srv/authentik/media:/media
       - /srv/authentik/custom-templates:/templates
       - /srv/authentik/certs:/certs
+      - ./blueprints:/blueprints/custom:ro
       #- /srv/authentik/custom-templates/custom-css.css:/web/dist/custom.css
   worker:
     volumes: !override
@@ -103,6 +104,7 @@ services:
       - /srv/authentik/certs:/certs
       - /srv/authentik/media:/media
       - /srv/authentik/custom-templates:/templates
+      - ./blueprints:/blueprints/custom:ro
       #- /srv/authentik/custom-templates/custom-css.css:/web/dist/custom.css
 
   tsidp:
