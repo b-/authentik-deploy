@@ -33,11 +33,12 @@ entries:
 
         # node/tailnet are omitted by tsidp when it can't see the device name
         # (e.g. logins from tailnets tsidp is shared into), so fall back by uid.
+        # keys are strings so they match whether tsidp sends uid as a number or a string
         UID_TAILNET = {
-            # 4750599723748100: "tailnet-b",
+            "3610643009748695": "perchnet",
         }
         ts = {k: claims.get(k) for k in ("tailnet", "node", "nid", "addresses", "key", "uid")}
-        ts["tailnet"] = ts["tailnet"] or UID_TAILNET.get(ts["uid"], "shared/unknown")
+        ts["tailnet"] = ts["tailnet"] or UID_TAILNET.get(str(ts["uid"]), "shared/unknown")
         return {"attributes": {"tsidp": ts}}
 
   - model: authentik_sources_oauth.oauthsourcepropertymapping
